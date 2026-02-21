@@ -54,7 +54,7 @@ export default function HomePage() {
             className="btn-primary flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5" />
-            Add Compound
+            New Compound
           </button>
           <button
             onClick={() => navigate('/calculate')}
@@ -87,7 +87,7 @@ export default function HomePage() {
                 className="btn-primary max-w-[220px] mx-auto flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Add Compound
+                New Compound
               </button>
             </motion.div>
           ) : (
