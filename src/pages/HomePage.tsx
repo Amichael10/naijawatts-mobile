@@ -11,11 +11,11 @@ const TENANT_COLORS = [
   '#A78BFA', '#60A5FA', '#FB923C', '#34D399',
 ];
 
-function getGreeting(): { text: string; emoji: string } {
+function getGreeting(): { label: string; emoji: string; subtitle: string } {
   const h = new Date().getHours();
-  if (h < 12) return { text: 'Good morning', emoji: '☀️' };
-  if (h < 17) return { text: 'Good afternoon', emoji: '🌤️' };
-  return { text: 'Good evening', emoji: '🌙' };
+  if (h < 12) return { label: 'Good morning', emoji: '☀️', subtitle: "Ready to split today's bills?" };
+  if (h < 17) return { label: 'Good afternoon', emoji: '🌤️', subtitle: 'Ready to calculate this afternoon?' };
+  return { label: 'Good evening', emoji: '🌙', subtitle: "Let's settle tonight's bills." };
 }
 
 function formatDate(dateStr: string): string {
@@ -71,11 +71,11 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <p className="text-sm text-muted-foreground font-body">
-            {greeting.text} {greeting.emoji}
+          <p className="text-[13px] text-muted-foreground font-body">
+            {greeting.label} {greeting.emoji}
           </p>
-          <h2 className="text-[28px] font-display font-bold text-primary leading-tight">
-            NaijaWatts ⚡
+          <h2 className="text-[22px] font-display font-bold text-foreground leading-tight">
+            {greeting.subtitle}
           </h2>
         </motion.div>
 
