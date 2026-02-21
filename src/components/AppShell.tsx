@@ -35,11 +35,15 @@ export default function AppShell({ children, title, showBack }: AppShellProps) {
               Back
             </button>
           ) : (
-            <div className="w-12" />
+            <h1 className="font-display font-extrabold text-xl text-primary">
+              {title || 'NaijaWatts ⚡'}
+            </h1>
           )}
-          <h1 className="font-display font-extrabold text-xl text-primary">
-            {title || 'NaijaWatts ⚡'}
-          </h1>
+          {showBack && (
+            <h1 className="font-display font-extrabold text-xl text-primary">
+              {title || 'NaijaWatts ⚡'}
+            </h1>
+          )}
           {isHome ? (
             <button
               onClick={toggleTheme}
@@ -49,7 +53,7 @@ export default function AppShell({ children, title, showBack }: AppShellProps) {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           ) : (
-            <div className="w-12" />
+            <div className="w-10" />
           )}
         </div>
       </header>
