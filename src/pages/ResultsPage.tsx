@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Share2 } from 'lucide-react';
+import LightningLoader from '@/components/LightningLoader';
 import AppShell from '@/components/AppShell';
 import { BillCalculation } from '@/lib/types';
 
@@ -103,6 +104,7 @@ function DonutChart({ results, total }: { results: BillCalculation['results']; t
 
 export default function ResultsPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const calcData = sessionStorage.getItem('naijawatts_lastcalc');
   const compoundName = sessionStorage.getItem('naijawatts_lastcompound') || 'Quick Calculation';
 
@@ -133,6 +135,10 @@ export default function ResultsPage() {
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
+
+  if (loading) {
+    return <LightningLoader onComplete={() => setLoading(false)} />;
+  }
 
   return (
     <AppShell title="Results" showBack>
