@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Calculator, Clock, ChevronLeft } from 'lucide-react';
+import { Home, Calculator, Clock, ChevronLeft, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
 interface AppShellProps {
   children: ReactNode;
@@ -17,6 +18,8 @@ const navItems = [
 export default function AppShell({ children, title, showBack }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const isHome = location.pathname === '/';
 
   return (
     <div className="app-container bg-background">
@@ -32,12 +35,22 @@ export default function AppShell({ children, title, showBack }: AppShellProps) {
               Back
             </button>
           ) : (
-            <div />
+            <div className="w-12" />
           )}
           <h1 className="font-display font-extrabold text-xl text-primary">
             {title || 'NaijaWatts ⚡'}
           </h1>
-          <div className="w-12" />
+          {isHome ? (
+            <button
+              onClick={toggleTheme}
+              className="w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground active:scale-90 transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          ) : (
+            <div className="w-12" />
+          )}
         </div>
       </header>
 

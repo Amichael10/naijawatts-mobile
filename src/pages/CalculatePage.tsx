@@ -125,7 +125,6 @@ export default function CalculatePage() {
       addCalculationToHistory(compoundId, calc);
     }
 
-    // Store calc temporarily for results page
     sessionStorage.setItem('naijawatts_lastcalc', JSON.stringify(calc));
     sessionStorage.setItem('naijawatts_lastcompound', compound?.name || 'Quick Calculation');
     navigate('/results');
@@ -138,7 +137,7 @@ export default function CalculatePage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-muted rounded-full p-1 flex"
+          className="bg-secondary rounded-full p-1 flex border border-border"
         >
           {(['smart', 'equal'] as const).map((m) => (
             <button
@@ -221,7 +220,7 @@ export default function CalculatePage() {
             )}
 
             {!compound && (
-              <div className="card-surface bg-accent/30">
+              <div className="card-surface border-primary/30">
                 <p className="text-sm text-foreground font-body">
                   💡 To use Smart Split with tenant names, first create a compound from the Home screen.
                 </p>

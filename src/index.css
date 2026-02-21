@@ -6,26 +6,73 @@
 
 @layer base {
   :root {
-    --background: 24 100% 97.6%;
-    --foreground: 240 33% 14%;
+    --background: 0 0% 6.7%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 33% 14%;
+    --card: 0 0% 13.3%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 33% 14%;
+    --popover: 0 0% 13.3%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 18 100% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 73 89% 58%;
+    --primary-foreground: 0 0% 6.7%;
 
-    --secondary: 174 62% 47%;
+    --secondary: 0 0% 10.2%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 24 30% 94%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 16.5%;
+    --muted-foreground: 0 0% 53.3%;
 
-    --accent: 44 100% 70%;
-    --accent-foreground: 240 33% 14%;
+    --accent: 73 89% 58%;
+    --accent-foreground: 0 0% 6.7%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 100% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 16.5%;
+    --input: 0 0% 16.5%;
+    --ring: 73 89% 58%;
+
+    --radius: 1rem;
+
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+    --sidebar-background: 0 0% 10.2%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 73 89% 58%;
+    --sidebar-primary-foreground: 0 0% 6.7%;
+    --sidebar-accent: 0 0% 16.5%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 16.5%;
+    --sidebar-ring: 73 89% 58%;
+  }
+
+  .light {
+    --background: 0 0% 96.1%;
+    --foreground: 0 0% 6.7%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 6.7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 6.7%;
+
+    --primary: 82 62% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 6.7%;
+
+    --muted: 0 0% 93%;
+    --muted-foreground: 220 9% 42%;
+
+    --accent: 82 62% 40%;
+    --accent-foreground: 0 0% 100%;
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
@@ -33,29 +80,27 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 18 100% 60%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 82 62% 40%;
 
-    --radius: 1rem;
-
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.1);
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 0 0% 6.7%;
+    --sidebar-primary: 82 62% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 95.9%;
+    --sidebar-accent-foreground: 0 0% 6.7%;
+    --sidebar-border: 0 0% 89.8%;
+    --sidebar-ring: 82 62% 40%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-200;
   }
 
   body {
@@ -89,12 +134,12 @@
   }
 
   .card-surface {
-    @apply bg-card rounded-2xl p-5;
+    @apply bg-card rounded-2xl p-5 border border-border;
     box-shadow: var(--shadow-card);
   }
 
   .card-surface-hover {
-    @apply bg-card rounded-2xl p-5 transition-all duration-200;
+    @apply bg-card rounded-2xl p-5 border border-border transition-all duration-200;
     box-shadow: var(--shadow-card);
   }
 
@@ -105,12 +150,12 @@
   }
 
   .input-field {
-    @apply w-full rounded-xl border border-input bg-card px-4 py-3 text-base font-body transition-all duration-200 outline-none;
+    @apply w-full rounded-xl border border-input bg-secondary px-4 py-3 text-base font-body text-foreground transition-all duration-200 outline-none;
   }
 
   .input-field:focus {
     @apply border-primary;
-    box-shadow: 0 0 0 3px hsl(18 100% 60% / 0.15);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2);
   }
 
   .input-label {
@@ -122,16 +167,16 @@
   }
 
   .btn-secondary {
-    @apply w-full rounded-full bg-card text-primary border-2 border-primary font-display font-bold text-base py-3.5 px-6 transition-all duration-150 active:scale-[0.97];
+    @apply w-full rounded-full bg-transparent text-primary border-2 border-primary font-display font-bold text-base py-3.5 px-6 transition-all duration-150 active:scale-[0.97];
   }
 
   .bottom-nav {
-    @apply fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-card border-t border-border safe-bottom;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    @apply fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-secondary border-t border-border safe-bottom;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
   }
 
   .tenant-result-card {
-    @apply bg-card rounded-2xl p-4 border-l-4 border-l-primary;
+    @apply bg-card rounded-2xl p-4 border border-border border-l-4 border-l-primary;
     box-shadow: var(--shadow-card);
   }
 
