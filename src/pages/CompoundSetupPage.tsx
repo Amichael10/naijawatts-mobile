@@ -23,14 +23,14 @@ export default function CompoundSetupPage() {
 
   const [newFlat, setNewFlat] = useState('');
   const [newName, setNewName] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<{ flat?: boolean; name?: boolean }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ flat?: string; name?: string }>({});
   const flatRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
 
   const addTenant = () => {
-    const errs: { flat?: boolean; name?: boolean } = {};
-    if (!newFlat.trim()) errs.flat = true;
-    if (!newName.trim()) errs.name = true;
+    const errs: { flat?: string; name?: string } = {};
+    if (!newFlat.trim()) errs.flat = 'Flat/Room label required';
+    if (!newName.trim()) errs.name = 'Tenant name required';
     if (Object.keys(errs).length > 0) {
       setFieldErrors(errs);
       return;
@@ -98,10 +98,11 @@ export default function CompoundSetupPage() {
             placeholder='e.g. "No. 14 Balogun Street"'
             className={`w-full rounded-[14px] border bg-secondary px-4 py-[18px] text-base font-body text-foreground transition-all duration-200 outline-none min-h-[56px] ${
               nameError
-                ? 'animate-shake border-destructive'
+                ? 'animate-shake !border-[#FF4D4D]'
                 : 'border-input focus:border-primary focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.15)]'
             }`}
           />
+          {nameError && <p className="text-[12px] font-body mt-1" style={{ color: '#FF4D4D' }}>Compound name is required</p>}
         </motion.div>
 
         {/* Tenants Section */}
@@ -158,15 +159,16 @@ export default function CompoundSetupPage() {
                   value={newFlat}
                   onChange={(e) => {
                     setNewFlat(e.target.value);
-                    setFieldErrors(p => ({ ...p, flat: false }));
+                    setFieldErrors(p => ({ ...p, flat: undefined }));
                   }}
                   placeholder="e.g. Flat 2, BQ, Room 3"
                   className={`w-full rounded-[14px] border bg-secondary px-4 py-[18px] text-base font-body text-foreground transition-all duration-200 outline-none min-h-[56px] ${
                     fieldErrors.flat
-                      ? 'animate-shake border-destructive'
+                      ? 'animate-shake !border-[#FF4D4D]'
                       : 'border-input focus:border-primary focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.15)]'
                   }`}
                 />
+                {fieldErrors.flat && <p className="text-[12px] font-body mt-1" style={{ color: '#FF4D4D' }}>{fieldErrors.flat}</p>}
               </div>
               <div>
                 <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">
@@ -177,15 +179,16 @@ export default function CompoundSetupPage() {
                   value={newName}
                   onChange={(e) => {
                     setNewName(e.target.value);
-                    setFieldErrors(p => ({ ...p, name: false }));
+                    setFieldErrors(p => ({ ...p, name: undefined }));
                   }}
                   placeholder="e.g. Emeka"
                   className={`w-full rounded-[14px] border bg-secondary px-4 py-[18px] text-base font-body text-foreground transition-all duration-200 outline-none min-h-[56px] ${
                     fieldErrors.name
-                      ? 'animate-shake border-destructive'
+                      ? 'animate-shake !border-[#FF4D4D]'
                       : 'border-input focus:border-primary focus:shadow-[0_0_0_3px_hsl(var(--primary)/0.15)]'
                   }`}
                 />
+                {fieldErrors.name && <p className="text-[12px] font-body mt-1" style={{ color: '#FF4D4D' }}>{fieldErrors.name}</p>}
               </div>
             </div>
             <div className="mt-5">

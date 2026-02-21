@@ -3,11 +3,29 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AppShell from '@/components/AppShell';
 import { getCompound, addCalculationToHistory, generateId } from '@/lib/storage';
-import { Compound, TenantResult, BillCalculation } from '@/lib/types';
+import { TenantResult, BillCalculation } from '@/lib/types';
 
 function roundTo2(n: number): number {
   return Math.round(n * 100) / 100;
 }
+
+/** Clamp negatives to 0 */
+function clampInput(val: string): string {
+  const n = Number(val);
+  if (val !== '' && !isNaN(n) && n < 0) return '0';
+  return val;
+}
+
+function InlineError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="text-[12px] font-body mt-1" style={{ color: '#FF4D4D' }}>
+      {message}
+    </p>
+  );
+}
+
+const errorBorderStyle = '!border-[#FF4D4D] animate-shake';
 
 export default function CalculatePage() {
   const [searchParams] = useSearchParams();
@@ -19,8 +37,8 @@ export default function CalculatePage() {
 
   // Smart split state
   const [totalUnits, setTotalUnits] = useState('');
-  const [costInput, setCostInput] = useState('');
-  const [costType, setCostType] = useState<'perUnit' | 'total'>('total');
+  const [costPerUnit, setCostPerUnit] = useState('');
+  const [totalAmount, setTotalAmount] = useState('');
   const [readings, setReadings] = useState<Record<string, string>>(
     compound ? Object.fromEntries(compound.tenants.map(t => [t.id, ''])) : {}
   );
@@ -29,22 +47,53 @@ export default function CalculatePage() {
   const [equalTotal, setEqualTotal] = useState('');
   const [equalCount, setEqualCount] = useState(compound ? String(compound.tenants.length) : '2');
 
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const clearError = (key: string) => {
+    setErrors(p => { const n = { ...p }; delete n[key]; return n; });
+  };
 
   const handleCalculate = () => {
-    const newErrors: Record<string, boolean> = {};
+    const newErrors: Record<string, string> = {};
 
     if (mode === 'smart') {
-      if (!totalUnits || isNaN(Number(totalUnits))) newErrors['totalUnits'] = true;
-      if (!costInput || isNaN(Number(costInput))) newErrors['costInput'] = true;
+      const units = Number(totalUnits);
+      if (!totalUnits || isNaN(units) || units <= 0) {
+        newErrors['totalUnits'] = 'Enter total units (must be > 0)';
+      }
+
+      const hasTotal = totalAmount !== '' && !isNaN(Number(totalAmount));
+      const hasCPU = costPerUnit !== '' && !isNaN(Number(costPerUnit));
+
+      if (!hasTotal && !hasCPU) {
+        newErrors['totalAmount'] = 'Enter total amount or cost per unit';
+        newErrors['costPerUnit'] = 'Enter cost per unit or total amount';
+      }
+
       if (compound) {
+        let nonZeroCount = 0;
         compound.tenants.forEach(t => {
-          if (!readings[t.id] || isNaN(Number(readings[t.id]))) newErrors[`reading-${t.id}`] = true;
+          const val = readings[t.id];
+          if (val === '' || val === undefined) {
+            newErrors[`reading-${t.id}`] = 'Enter kWh reading';
+          } else if (isNaN(Number(val)) || Number(val) < 0) {
+            newErrors[`reading-${t.id}`] = 'Must be ≥ 0';
+          } else if (Number(val) > 0) {
+            nonZeroCount++;
+          }
         });
+        // At least 2 tenants with > 0 kWh
+        if (Object.keys(newErrors).filter(k => k.startsWith('reading-')).length === 0 && nonZeroCount < 2) {
+          newErrors['readingsGeneral'] = 'At least 2 tenants must have kWh > 0';
+        }
       }
     } else {
-      if (!equalTotal || isNaN(Number(equalTotal))) newErrors['equalTotal'] = true;
-      if (!equalCount || isNaN(Number(equalCount)) || Number(equalCount) < 1) newErrors['equalCount'] = true;
+      if (!equalTotal || isNaN(Number(equalTotal)) || Number(equalTotal) <= 0) {
+        newErrors['equalTotal'] = 'Enter a valid amount > 0';
+      }
+      if (!equalCount || isNaN(Number(equalCount)) || Number(equalCount) < 1) {
+        newErrors['equalCount'] = 'Must be at least 1';
+      }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -53,24 +102,39 @@ export default function CalculatePage() {
     }
 
     let results: TenantResult[];
-    let totalAmount: number;
+    let finalTotal: number;
     let units: number | undefined;
     let cpu: number | undefined;
 
     if (mode === 'smart' && compound) {
       units = Number(totalUnits);
-      totalAmount = costType === 'total' ? Number(costInput) : Number(costInput) * units;
-      cpu = totalAmount / units;
+
+      // Determine total amount: if totalAmount is filled, use it as source of truth
+      const hasTotal = totalAmount !== '' && !isNaN(Number(totalAmount)) && Number(totalAmount) > 0;
+      const hasCPU = costPerUnit !== '' && !isNaN(Number(costPerUnit)) && Number(costPerUnit) > 0;
+
+      if (hasTotal) {
+        finalTotal = Number(totalAmount);
+        cpu = roundTo2(finalTotal / units);
+      } else if (hasCPU) {
+        cpu = Number(costPerUnit);
+        finalTotal = roundTo2(cpu * units);
+      } else {
+        finalTotal = 0;
+      }
 
       const tenantReadings = compound.tenants.map(t => ({
         tenant: t,
-        kwh: Number(readings[t.id]),
+        kwh: Number(readings[t.id]) || 0,
       }));
-      const totalKwh = tenantReadings.reduce((s, r) => s + r.kwh, 0);
+
+      // Only tenants with kWh > 0 participate in proportional split
+      const activeReadings = tenantReadings.filter(r => r.kwh > 0);
+      const totalKwh = activeReadings.reduce((s, r) => s + r.kwh, 0);
 
       const rawShares = tenantReadings.map(r => ({
         ...r,
-        raw: totalKwh > 0 ? (r.kwh / totalKwh) * totalAmount : 0,
+        raw: r.kwh > 0 && totalKwh > 0 ? (r.kwh / totalKwh) * finalTotal : 0,
       }));
 
       const rounded = rawShares.map(r => ({
@@ -79,20 +143,23 @@ export default function CalculatePage() {
       }));
 
       const roundedTotal = roundTo2(rounded.reduce((s, r) => s + r.rounded, 0));
-      const remainder = roundTo2(totalAmount - roundedTotal);
+      const remainder = roundTo2(finalTotal - roundedTotal);
+
+      // Add remainder to the first active tenant (kWh > 0)
+      const firstActiveIdx = rounded.findIndex(r => r.kwh > 0);
 
       results = rounded.map((r, i) => ({
         tenantId: r.tenant.id,
         name: r.tenant.name,
         flatLabel: r.tenant.flatLabel,
         kwhUsed: r.kwh,
-        amountOwed: roundTo2(r.rounded + (i === 0 ? remainder : 0)),
+        amountOwed: roundTo2(r.rounded + (i === firstActiveIdx ? remainder : 0)),
       }));
     } else {
-      totalAmount = Number(equalTotal);
+      finalTotal = Number(equalTotal);
       const count = Number(equalCount);
-      const perPerson = roundTo2(totalAmount / count);
-      const remainder = roundTo2(totalAmount - perPerson * count);
+      const perPerson = roundTo2(finalTotal / count);
+      const remainder = roundTo2(finalTotal - perPerson * count);
 
       if (compound) {
         results = compound.tenants.slice(0, count).map((t, i) => ({
@@ -115,7 +182,7 @@ export default function CalculatePage() {
       id: generateId(),
       date: new Date().toISOString(),
       mode,
-      totalAmount: mode === 'smart' ? totalAmount! : Number(equalTotal),
+      totalAmount: finalTotal,
       totalUnits: units,
       costPerUnit: cpu,
       results,
@@ -161,41 +228,77 @@ export default function CalculatePage() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
           >
+            {/* Total Units */}
             <div>
-              <label className="input-label">Total Units Purchased</label>
+              <label className="input-label">Total Units Purchased (kWh)</label>
               <input
                 type="number"
                 inputMode="decimal"
+                min="0"
+                step="0.1"
                 value={totalUnits}
-                onChange={(e) => { setTotalUnits(e.target.value); setErrors(p => ({ ...p, totalUnits: false })); }}
+                onChange={(e) => {
+                  setTotalUnits(clampInput(e.target.value));
+                  clearError('totalUnits');
+                }}
                 placeholder="e.g. 50"
-                className={`input-field ${errors['totalUnits'] ? 'animate-shake border-destructive' : ''}`}
+                className={`input-field ${errors['totalUnits'] ? errorBorderStyle : ''}`}
               />
+              <InlineError message={errors['totalUnits']} />
             </div>
 
+            {/* Total Amount */}
+            <div>
+              <label className="input-label">Total Amount Spent (₦)</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                step="1"
+                value={totalAmount}
+                onChange={(e) => {
+                  setTotalAmount(clampInput(e.target.value));
+                  clearError('totalAmount');
+                  clearError('costPerUnit');
+                }}
+                placeholder="e.g. 5000"
+                className={`input-field ${errors['totalAmount'] ? errorBorderStyle : ''}`}
+              />
+              <InlineError message={errors['totalAmount']} />
+            </div>
+
+            {/* Cost Per Unit */}
             <div>
               <label className="input-label">
-                {costType === 'total' ? 'Total Amount Spent (₦)' : 'Cost Per Unit (₦)'}
+                Cost Per Unit (₦/kWh)
+                <span className="text-muted-foreground font-normal text-xs ml-1">— or fill total above</span>
               </label>
               <input
                 type="number"
-                inputMode="decimal"
-                value={costInput}
-                onChange={(e) => { setCostInput(e.target.value); setErrors(p => ({ ...p, costInput: false })); }}
-                placeholder={costType === 'total' ? 'e.g. 5000' : 'e.g. 100'}
-                className={`input-field ${errors['costInput'] ? 'animate-shake border-destructive' : ''}`}
+                inputMode="numeric"
+                min="0"
+                step="1"
+                value={costPerUnit}
+                onChange={(e) => {
+                  setCostPerUnit(clampInput(e.target.value));
+                  clearError('costPerUnit');
+                  clearError('totalAmount');
+                }}
+                placeholder="e.g. 100"
+                className={`input-field ${errors['costPerUnit'] ? errorBorderStyle : ''}`}
               />
-              <button
-                onClick={() => setCostType(costType === 'total' ? 'perUnit' : 'total')}
-                className="mt-1.5 text-xs text-primary font-display font-semibold"
-              >
-                Switch to {costType === 'total' ? 'cost per unit' : 'total amount'}
-              </button>
+              <InlineError message={errors['costPerUnit']} />
             </div>
 
+            {/* Tenant Readings */}
             {compound && (
               <div>
                 <h3 className="input-label mb-3">Meter Readings (kWh)</h3>
+                {errors['readingsGeneral'] && (
+                  <p className="text-[12px] font-body mb-2" style={{ color: '#FF4D4D' }}>
+                    {errors['readingsGeneral']}
+                  </p>
+                )}
                 <div className="space-y-3">
                   {compound.tenants.map((tenant) => (
                     <div key={tenant.id} className="card-surface">
@@ -205,14 +308,18 @@ export default function CalculatePage() {
                       <input
                         type="number"
                         inputMode="decimal"
+                        min="0"
+                        step="0.1"
                         value={readings[tenant.id] || ''}
                         onChange={(e) => {
-                          setReadings(prev => ({ ...prev, [tenant.id]: e.target.value }));
-                          setErrors(p => ({ ...p, [`reading-${tenant.id}`]: false }));
+                          setReadings(prev => ({ ...prev, [tenant.id]: clampInput(e.target.value) }));
+                          clearError(`reading-${tenant.id}`);
+                          clearError('readingsGeneral');
                         }}
                         placeholder="kWh used"
-                        className={`input-field mt-2 ${errors[`reading-${tenant.id}`] ? 'animate-shake border-destructive' : ''}`}
+                        className={`input-field mt-2 ${errors[`reading-${tenant.id}`] ? errorBorderStyle : ''}`}
                       />
+                      <InlineError message={errors[`reading-${tenant.id}`]} />
                     </div>
                   ))}
                 </div>
@@ -238,23 +345,35 @@ export default function CalculatePage() {
               <label className="input-label">Total Amount Spent (₦)</label>
               <input
                 type="number"
-                inputMode="decimal"
+                inputMode="numeric"
+                min="0"
+                step="1"
                 value={equalTotal}
-                onChange={(e) => { setEqualTotal(e.target.value); setErrors(p => ({ ...p, equalTotal: false })); }}
+                onChange={(e) => {
+                  setEqualTotal(clampInput(e.target.value));
+                  clearError('equalTotal');
+                }}
                 placeholder="e.g. 10000"
-                className={`input-field ${errors['equalTotal'] ? 'animate-shake border-destructive' : ''}`}
+                className={`input-field ${errors['equalTotal'] ? errorBorderStyle : ''}`}
               />
+              <InlineError message={errors['equalTotal']} />
             </div>
             <div>
               <label className="input-label">Number of Tenants</label>
               <input
                 type="number"
                 inputMode="numeric"
+                min="1"
+                step="1"
                 value={equalCount}
-                onChange={(e) => { setEqualCount(e.target.value); setErrors(p => ({ ...p, equalCount: false })); }}
+                onChange={(e) => {
+                  setEqualCount(clampInput(e.target.value));
+                  clearError('equalCount');
+                }}
                 placeholder="e.g. 4"
-                className={`input-field ${errors['equalCount'] ? 'animate-shake border-destructive' : ''}`}
+                className={`input-field ${errors['equalCount'] ? errorBorderStyle : ''}`}
               />
+              <InlineError message={errors['equalCount']} />
             </div>
           </motion.div>
         )}
