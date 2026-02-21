@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 
 const BOLT_PATH = "M 52 0 L 20 75 L 48 75 L 28 140 L 95 55 L 62 55 L 80 0 Z";
 
-export default function LightningLoader({ onComplete }: { onComplete: () => void }) {
+interface LightningLoaderProps {
+  onComplete: () => void;
+  text?: string;
+}
+
+export default function LightningLoader({ onComplete, text = 'Calculating' }: LightningLoaderProps) {
   const [dots, setDots] = useState('.');
   const [fadeOut, setFadeOut] = useState(false);
 
@@ -121,7 +126,7 @@ export default function LightningLoader({ onComplete }: { onComplete: () => void
           animation: 'fade-in 0.3s ease-out 0.5s both',
         }}
       >
-        Calculating{dots}
+        {text}{dots}
       </p>
     </div>
   );
