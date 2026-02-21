@@ -5,8 +5,8 @@ import AppShell from '@/components/AppShell';
 import { getCompound, addCalculationToHistory, generateId } from '@/lib/storage';
 import { Compound, TenantResult, BillCalculation } from '@/lib/types';
 
-function roundToNearest10(n: number): number {
-  return Math.round(n / 10) * 10;
+function roundTo2(n: number): number {
+  return Math.round(n * 100) / 100;
 }
 
 export default function CalculatePage() {
@@ -75,24 +75,24 @@ export default function CalculatePage() {
 
       const rounded = rawShares.map(r => ({
         ...r,
-        rounded: roundToNearest10(r.raw),
+        rounded: roundTo2(r.raw),
       }));
 
-      const roundedTotal = rounded.reduce((s, r) => s + r.rounded, 0);
-      const remainder = totalAmount - roundedTotal;
+      const roundedTotal = roundTo2(rounded.reduce((s, r) => s + r.rounded, 0));
+      const remainder = roundTo2(totalAmount - roundedTotal);
 
       results = rounded.map((r, i) => ({
         tenantId: r.tenant.id,
         name: r.tenant.name,
         flatLabel: r.tenant.flatLabel,
         kwhUsed: r.kwh,
-        amountOwed: r.rounded + (i === 0 ? remainder : 0),
+        amountOwed: roundTo2(r.rounded + (i === 0 ? remainder : 0)),
       }));
     } else {
       totalAmount = Number(equalTotal);
       const count = Number(equalCount);
-      const perPerson = roundToNearest10(totalAmount / count);
-      const remainder = totalAmount - perPerson * count;
+      const perPerson = roundTo2(totalAmount / count);
+      const remainder = roundTo2(totalAmount - perPerson * count);
 
       if (compound) {
         results = compound.tenants.slice(0, count).map((t, i) => ({
