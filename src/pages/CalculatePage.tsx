@@ -326,11 +326,17 @@ export default function CalculatePage() {
               </div>
             )}
 
-            {!compound && (
+      {!compound && (
               <div className="card-surface border-primary/30">
                 <p className="text-sm text-foreground font-body">
-                  💡 To use Smart Split with tenant names, first create a compound from the Home screen.
+                  ⚠️ Smart Split requires a compound with tenants. Please create one first from the Home screen.
                 </p>
+                <button
+                  onClick={() => navigate('/compound/new')}
+                  className="btn-primary mt-3 text-sm"
+                >
+                  Create Compound
+                </button>
               </div>
             )}
           </motion.div>
@@ -378,7 +384,11 @@ export default function CalculatePage() {
           </motion.div>
         )}
 
-        <button onClick={handleCalculate} className="btn-primary text-lg">
+        <button
+          onClick={handleCalculate}
+          disabled={mode === 'smart' && !compound}
+          className="btn-primary text-lg disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           Calculate Split
         </button>
       </div>

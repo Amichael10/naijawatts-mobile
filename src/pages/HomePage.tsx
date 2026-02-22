@@ -211,7 +211,13 @@ export default function HomePage() {
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <button
-            onClick={() => navigate('/calculate')}
+            onClick={() => {
+              if (compounds.length > 0) {
+                navigate(`/calculate?compound=${compounds[0].id}`);
+              } else {
+                navigate('/calculate');
+              }
+            }}
             className="btn-secondary flex items-center justify-center gap-2 min-h-[56px]"
           >
             <Zap className="w-5 h-5" />
