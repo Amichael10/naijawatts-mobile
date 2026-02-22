@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import AppShell from '@/components/AppShell';
-import { getCompound, addCalculationToHistory, generateId } from '@/lib/storage';
-import { TenantResult, BillCalculation } from '@/lib/types';
+import { getCompound, getCompounds, addCalculationToHistory, generateId } from '@/lib/storage';
+import { TenantResult, BillCalculation, Compound } from '@/lib/types';
 
 function roundTo2(n: number): number {
   return Math.round(n * 100) / 100;
@@ -28,12 +28,14 @@ function InlineError({ message }: { message?: string }) {
 const errorBorderStyle = '!border-[#FF4D4D] animate-shake';
 
 export default function CalculatePage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const allCompounds = getCompounds();
   const compoundId = searchParams.get('compound');
   const compound = compoundId ? getCompound(compoundId) : null;
 
   const [mode, setMode] = useState<'smart' | 'equal'>('smart');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Smart split state
   const [totalUnits, setTotalUnits] = useState('');
@@ -46,6 +48,17 @@ export default function CalculatePage() {
   // Equal split state
   const [equalTotal, setEqualTotal] = useState('');
   const [equalCount, setEqualCount] = useState(compound ? String(compound.tenants.length) : '2');
+
+  const handleSelectCompound = (id: string) => {
+    setSearchParams({ compound: id });
+    setDropdownOpen(false);
+    const c = getCompound(id);
+    if (c) {
+      setReadings(Object.fromEntries(c.tenants.map(t => [t.id, ''])));
+      setEqualCount(String(c.tenants.length));
+    }
+    setErrors({});
+  };
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -290,6 +303,60 @@ export default function CalculatePage() {
               <InlineError message={errors['costPerUnit']} />
             </div>
 
+            {/* Compound Selector */}
+            <div>
+              <label className="input-label mb-2">Select Compound</label>
+              {allCompounds.length > 0 ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className={`input-field flex items-center justify-between w-full text-left ${!compound ? 'text-muted-foreground' : 'text-foreground'}`}
+                  >
+                    <span>{compound ? `⚡ ${compound.name}` : 'Choose a compound...'}</span>
+                    <svg className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 10 6">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                      {allCompounds.map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => handleSelectCompound(c.id)}
+                          className={`block w-full text-left px-4 py-3 text-sm font-body transition-colors hover:bg-secondary ${c.id === compoundId ? 'bg-primary/10 text-primary font-semibold' : 'text-foreground'}`}
+                        >
+                          ⚡ {c.name}
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({c.tenants.length} tenant{c.tenants.length !== 1 ? 's' : ''})
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="card-surface border-primary/30">
+                  <p className="text-sm text-foreground font-body">
+                    ⚠️ No compounds yet. Create one to use Smart Split.
+                  </p>
+                  <button
+                    onClick={() => navigate('/compound/new')}
+                    className="btn-primary mt-3 text-sm"
+                  >
+                    Create Compound
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {!compound && allCompounds.length > 0 && (
+              <p className="text-sm text-muted-foreground font-body text-center">
+                👆 Select a compound above to enter meter readings
+              </p>
+            )}
+
             {/* Tenant Readings */}
             {compound && (
               <div>
@@ -323,20 +390,6 @@ export default function CalculatePage() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-      {!compound && (
-              <div className="card-surface border-primary/30">
-                <p className="text-sm text-foreground font-body">
-                  ⚠️ Smart Split requires a compound with tenants. Please create one first from the Home screen.
-                </p>
-                <button
-                  onClick={() => navigate('/compound/new')}
-                  className="btn-primary mt-3 text-sm"
-                >
-                  Create Compound
-                </button>
               </div>
             )}
           </motion.div>
