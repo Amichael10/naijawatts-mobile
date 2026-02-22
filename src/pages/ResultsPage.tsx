@@ -122,16 +122,20 @@ export default function ResultsPage() {
   }
 
   const calc: BillCalculation = JSON.parse(calcData);
-  const total = calc.results.reduce((s, r) => s + r.amountOwed, 0);
+  const totalUsed = calc.results.reduce((s, r) => s + r.amountOwed, 0);
   const date = new Date(calc.date).toLocaleDateString('en-NG', {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 
   const shareViaWhatsApp = () => {
     const lines = calc.results.map(r =>
-      `${r.flatLabel} (${r.name}): ${formatNaira(r.amountOwed)}`
+      `${r.flatLabel} (${r.name}): ${formatNaira(r.amountOwed)}${r.kwhUsed !== undefined ? ` (${r.kwhUsed} kWh)` : ''}`
     );
-    const message = `⚡ NaijaWatts Bill Split — ${compoundName}\n📅 ${date}\n\n${lines.join('\n')}\n\nTotal: ${formatNaira(calc.totalAmount)}\nCalculated with NaijaWatts`;
+    let message = `⚡ NaijaWatts Bill Split — ${compoundName}\n📅 ${date}\n\n${lines.join('\n')}\n\nTotal Spent: ${formatNaira(calc.totalAmount)}`;
+    if (calc.remainingUnits !== undefined) {
+      message += `\nRemaining: ${calc.remainingUnits} kWh (${formatNaira(calc.remainingAmount!)})`;
+    }
+    message += `\n\nCalculated with NaijaWatts`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -150,7 +154,7 @@ export default function ResultsPage() {
           transition={{ duration: 0.4 }}
           className="flex flex-col items-center"
         >
-          <DonutChart results={calc.results} total={total} />
+          <DonutChart results={calc.results} total={totalUsed} />
           <p className="text-[13px] text-muted-foreground font-body mt-3 text-center">
             {compoundName} · {date}
           </p>
@@ -164,7 +168,7 @@ export default function ResultsPage() {
           className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
         >
           {calc.results.map((r, i) => {
-            const pct = total > 0 ? Math.round((r.amountOwed / total) * 100) : 0;
+            const pct = totalUsed > 0 ? Math.round((r.amountOwed / totalUsed) * 100) : 0;
             return (
               <div
                 key={r.tenantId}
@@ -221,6 +225,41 @@ export default function ResultsPage() {
             ))}
           </div>
         </div>
+
+        {/* Remaining Balance */}
+        {calc.remainingUnits !== undefined && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className={`card-surface ${calc.remainingUnits < 0 ? 'border-[#FF4D4D]/50' : 'border-primary/30'}`}
+          >
+            {calc.remainingUnits < 0 && (
+              <p className="text-[12px] font-body mb-2" style={{ color: '#FF4D4D' }}>
+                ⚠️ Warning: Tenants used more than purchased units!
+              </p>
+            )}
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-body text-muted-foreground">Remaining Balance</p>
+                <p className="text-lg font-display font-bold text-foreground">
+                  {calc.remainingUnits} kWh
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-body text-muted-foreground">Worth</p>
+                <p className={`text-lg font-display font-bold ${calc.remainingAmount! < 0 ? 'text-[#FF4D4D]' : 'text-primary'}`}>
+                  {formatNaira(calc.remainingAmount!)}
+                </p>
+              </div>
+            </div>
+            {calc.costPerUnit && (
+              <p className="text-xs text-muted-foreground font-body mt-2">
+                Rate: ₦{calc.costPerUnit}/kWh
+              </p>
+            )}
+          </motion.div>
+        )}
 
         {/* Share */}
         <motion.div

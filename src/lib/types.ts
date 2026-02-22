@@ -12,6 +12,8 @@ export interface BillCalculation {
   totalUnits?: number;
   costPerUnit?: number;
   results: TenantResult[];
+  remainingUnits?: number;
+  remainingAmount?: number;
 }
 
 export interface TenantResult {
