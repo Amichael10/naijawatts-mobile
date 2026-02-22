@@ -75,30 +75,20 @@ export default function CalculatePage() {
         newErrors['totalUnits'] = 'Enter total units (must be > 0)';
       }
 
-      const hasTotal = totalAmount !== '' && !isNaN(Number(totalAmount));
-      const hasCPU = costPerUnit !== '' && !isNaN(Number(costPerUnit));
-
-      if (!hasTotal && !hasCPU) {
-        newErrors['totalAmount'] = 'Enter total amount or cost per unit';
-        newErrors['costPerUnit'] = 'Enter cost per unit or total amount';
+      const ta = Number(totalAmount);
+      if (!totalAmount || isNaN(ta) || ta <= 0) {
+        newErrors['totalAmount'] = 'Enter total amount spent (must be > 0)';
       }
 
       if (compound) {
-        let nonZeroCount = 0;
         compound.tenants.forEach(t => {
           const val = readings[t.id];
           if (val === '' || val === undefined) {
             newErrors[`reading-${t.id}`] = 'Enter kWh reading';
           } else if (isNaN(Number(val)) || Number(val) < 0) {
             newErrors[`reading-${t.id}`] = 'Must be ≥ 0';
-          } else if (Number(val) > 0) {
-            nonZeroCount++;
           }
         });
-        // At least 2 tenants with > 0 kWh
-        if (Object.keys(newErrors).filter(k => k.startsWith('reading-')).length === 0 && nonZeroCount < 2) {
-          newErrors['readingsGeneral'] = 'At least 2 tenants must have kWh > 0';
-        }
       }
     } else {
       if (!equalTotal || isNaN(Number(equalTotal)) || Number(equalTotal) <= 0) {
@@ -118,55 +108,29 @@ export default function CalculatePage() {
     let finalTotal: number;
     let units: number | undefined;
     let cpu: number | undefined;
+    let remainingUnits: number | undefined;
+    let remainingAmount: number | undefined;
 
     if (mode === 'smart' && compound) {
       units = Number(totalUnits);
-
-      // Determine total amount: if totalAmount is filled, use it as source of truth
-      const hasTotal = totalAmount !== '' && !isNaN(Number(totalAmount)) && Number(totalAmount) > 0;
-      const hasCPU = costPerUnit !== '' && !isNaN(Number(costPerUnit)) && Number(costPerUnit) > 0;
-
-      if (hasTotal) {
-        finalTotal = Number(totalAmount);
-        cpu = roundTo2(finalTotal / units);
-      } else if (hasCPU) {
-        cpu = Number(costPerUnit);
-        finalTotal = roundTo2(cpu * units);
-      } else {
-        finalTotal = 0;
-      }
+      finalTotal = Number(totalAmount);
+      cpu = roundTo2(finalTotal / units);
 
       const tenantReadings = compound.tenants.map(t => ({
         tenant: t,
         kwh: Number(readings[t.id]) || 0,
       }));
 
-      // Only tenants with kWh > 0 participate in proportional split
-      const activeReadings = tenantReadings.filter(r => r.kwh > 0);
-      const totalKwh = activeReadings.reduce((s, r) => s + r.kwh, 0);
+      const totalUsed = tenantReadings.reduce((s, r) => s + r.kwh, 0);
+      remainingUnits = roundTo2(units - totalUsed);
+      remainingAmount = roundTo2(remainingUnits * cpu);
 
-      const rawShares = tenantReadings.map(r => ({
-        ...r,
-        raw: r.kwh > 0 && totalKwh > 0 ? (r.kwh / totalKwh) * finalTotal : 0,
-      }));
-
-      const rounded = rawShares.map(r => ({
-        ...r,
-        rounded: roundTo2(r.raw),
-      }));
-
-      const roundedTotal = roundTo2(rounded.reduce((s, r) => s + r.rounded, 0));
-      const remainder = roundTo2(finalTotal - roundedTotal);
-
-      // Add remainder to the first active tenant (kWh > 0)
-      const firstActiveIdx = rounded.findIndex(r => r.kwh > 0);
-
-      results = rounded.map((r, i) => ({
+      results = tenantReadings.map(r => ({
         tenantId: r.tenant.id,
         name: r.tenant.name,
         flatLabel: r.tenant.flatLabel,
         kwhUsed: r.kwh,
-        amountOwed: roundTo2(r.rounded + (i === firstActiveIdx ? remainder : 0)),
+        amountOwed: roundTo2(r.kwh * cpu!),
       }));
     } else {
       finalTotal = Number(equalTotal);
@@ -199,6 +163,8 @@ export default function CalculatePage() {
       totalUnits: units,
       costPerUnit: cpu,
       results,
+      remainingUnits,
+      remainingAmount,
     };
 
     if (compoundId) {
@@ -280,28 +246,14 @@ export default function CalculatePage() {
               <InlineError message={errors['totalAmount']} />
             </div>
 
-            {/* Cost Per Unit */}
-            <div>
-              <label className="input-label">
-                Cost Per Unit (₦/kWh)
-                <span className="text-muted-foreground font-normal text-xs ml-1">— or fill total above</span>
-              </label>
-              <input
-                type="number"
-                inputMode="numeric"
-                min="0"
-                step="1"
-                value={costPerUnit}
-                onChange={(e) => {
-                  setCostPerUnit(clampInput(e.target.value));
-                  clearError('costPerUnit');
-                  clearError('totalAmount');
-                }}
-                placeholder="e.g. 100"
-                className={`input-field ${errors['costPerUnit'] ? errorBorderStyle : ''}`}
-              />
-              <InlineError message={errors['costPerUnit']} />
-            </div>
+            {/* Auto-calculated Cost Per Unit display */}
+            {totalUnits && totalAmount && Number(totalUnits) > 0 && Number(totalAmount) > 0 && (
+              <div className="card-surface border-primary/20">
+                <p className="text-sm font-body text-muted-foreground">
+                  Cost Per Unit: <span className="text-foreground font-semibold">₦{roundTo2(Number(totalAmount) / Number(totalUnits))}/kWh</span>
+                </p>
+              </div>
+            )}
 
             {/* Compound Selector */}
             <div>
