@@ -1,0 +1,11 @@
+<svg width="2048" height="2048" viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lightning Bolt (centered in safe area) -->
+  <path d="M 1024,650 
+           L 624,1355 
+           L 955,1355 
+           L 790,1760 
+           L 1424,1160 
+           L 1093,1160 
+           Z" 
+        fill="#C8F135" stroke="#C8F135" stroke-width="30" stroke-linejoin="round"/>
+</svg>
