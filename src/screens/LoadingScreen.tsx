@@ -95,29 +95,13 @@ export default function LoadingScreen() {
         <View style={styles.root}>
             {/* ── Lightning Bolt ── */}
             <View style={styles.boltContainer}>
-                <Svg width="120" height="180" viewBox="0 0 120 180">
-                    <Defs>
-                        <ClipPath id="fillClip">
-                            {/* y = 180 - progress, height = progress */}
-                            <AnimatedRect
-                                x="0"
-                                y={fillProgress.interpolate({
-                                    inputRange: [0, 180],
-                                    outputRange: [180, 0],
-                                })}
-                                width="120"
-                                height={fillProgress}
-                            />
-                        </ClipPath>
-                    </Defs>
-
-                    {/* 1. Outline Layer with Shadow */}
+                {/* 1. Static Outline with Shadow */}
+                <Svg width="120" height="180" viewBox="0 0 120 180" style={StyleSheet.absoluteFill}>
                     <Path
                         d={boltPath}
                         stroke={colors.accent}
                         strokeWidth="3"
                         fill="transparent"
-                        /* @ts-ignore RN SVG doesn't perfectly type standard shadow props on paths sometimes, wrap in view if true issue, but standard is requested */
                         style={{
                             shadowColor: colors.accent,
                             shadowRadius: 8,
@@ -125,15 +109,27 @@ export default function LoadingScreen() {
                             shadowOffset: { width: 0, height: 0 },
                         }}
                     />
+                </Svg>
 
-                    {/* 2. Fill Layer (Clipped) */}
-                    <Path
-                        d={boltPath}
-                        fill={colors.accent}
-                        clipPath="url(#fillClip)"
-                    />
+                {/* 2. Filling Layer (Simplified Animated View) */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        width: 120,
+                        overflow: 'hidden',
+                        height: fillProgress,
+                    }}
+                >
+                    <View style={{ position: 'absolute', bottom: 0, width: 120, height: 180 }}>
+                        <Svg width="120" height="180" viewBox="0 0 120 180">
+                            <Path d={boltPath} fill={colors.accent} />
+                        </Svg>
+                    </View>
+                </Animated.View>
 
-                    {/* 3. Bubbles */}
+                {/* 3. Bubbles (Overlay) */}
+                <View style={StyleSheet.absoluteFill} pointerEvents="none">
                     {/* Bubble 1 (bottom left) */}
                     <Animated.View
                         style={{
@@ -196,8 +192,7 @@ export default function LoadingScreen() {
                     >
                         <Svg width="8" height="8"><Circle cx="4" cy="4" r="4" fill="white" /></Svg>
                     </Animated.View>
-
-                </Svg>
+                </View>
             </View>
 
             {/* ── Text ── */}

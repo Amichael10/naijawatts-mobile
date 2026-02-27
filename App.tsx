@@ -10,7 +10,10 @@ import {
   SpaceGrotesk_700Bold,
 } from '@expo-google-fonts/space-grotesk';
 import { ThemeProvider, useTheme } from './src/theme';
+import * as SplashScreen from 'expo-splash-screen';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+
+SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { mode, colors } = useTheme();
@@ -36,22 +39,28 @@ export default function App() {
   const [initialTheme, setInitialTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
-    AsyncStorage.getItem('naijawatts_theme')
-      .then(saved => {
+    async function prepare() {
+      try {
+        const saved = await AsyncStorage.getItem('naijawatts_theme');
         if (saved === 'light' || saved === 'dark') {
           setInitialTheme(saved);
         }
+      } catch (e) {
+      } finally {
         setThemeLoaded(true);
-      })
-      .catch(() => setThemeLoaded(true));
+      }
+    }
+    prepare();
   }, []);
 
+  useEffect(() => {
+    if (fontsLoaded && themeLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, themeLoaded]);
+
   if (!fontsLoaded || !themeLoaded) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#111111' }}>
-        <ActivityIndicator size="large" color="#C8F135" />
-      </View>
-    );
+    return null;
   }
 
   return (

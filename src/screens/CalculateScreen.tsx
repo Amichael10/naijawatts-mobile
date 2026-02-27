@@ -255,7 +255,8 @@ export default function CalculateScreen() {
             } catch (e) { }
 
             // Navigate to Results (assuming we pass the inline calc or rely on AsyncStorage history if saved)
-            navigation.navigate('Results', { calculationId: compound ? compound.id : 'quick' }); // Temporary routing
+            // Navigate to Loading screen first
+            navigation.navigate('Loading', { calculationId: compound ? compound.id : 'quick' });
         }
 
         // ── Validate Equal Split ──
@@ -313,7 +314,8 @@ export default function CalculateScreen() {
                 }
             } catch (e) { }
 
-            navigation.navigate('Results', { calculationId: compound ? compound.id : 'quick' });
+            // Navigate to Loading screen first
+            navigation.navigate('Loading', { calculationId: compound ? compound.id : 'quick' });
         }
     };
 
