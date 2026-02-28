@@ -99,8 +99,8 @@ function HistoryCard({
                 <Text style={[styles.cardDate, { color: colors.textSecondary }]}>
                     {formatDate(calc.date)}
                 </Text>
-                <View style={styles.badgeWrap}>
-                    <Text style={styles.badgeText}>
+                <View style={[styles.badgeWrap, { borderColor: colors.accent }]}>
+                    <Text style={[styles.badgeText, { color: colors.accent }]}>
                         {calc.mode === 'smart' ? 'Smart' : 'Equal'}
                     </Text>
                 </View>
@@ -151,11 +151,11 @@ function HistoryCard({
             {/* Bottom Share Button */}
             <View style={styles.cardBottomRow}>
                 <TouchableOpacity
-                    style={styles.inlineShareBtn}
+                    style={[styles.inlineShareBtn, { borderColor: colors.accent }]}
                     onPress={() => shareOnWhatsApp(calc)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                    <Text style={styles.inlineShareText}>Share on WhatsApp 📤</Text>
+                    <Text style={[styles.inlineShareText, { color: colors.accent }]}>Share on WhatsApp 📤</Text>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
@@ -454,13 +454,11 @@ const styles = StyleSheet.create({
     },
     badgeWrap: {
         borderWidth: 1,
-        borderColor: '#C8F135',
         paddingVertical: 3,
         paddingHorizontal: 8,
         borderRadius: 100,
     },
     badgeText: {
-        color: '#C8F135',
         fontFamily: fonts.bold,
         fontSize: 11,
     },
@@ -511,14 +509,12 @@ const styles = StyleSheet.create({
     inlineShareBtn: {
         height: 32,
         borderWidth: 1,
-        borderColor: '#C8F135',
         borderRadius: 100,
         paddingHorizontal: 12,
         alignItems: 'center',
         justifyContent: 'center',
     },
     inlineShareText: {
-        color: '#C8F135',
         fontFamily: fonts.medium,
         fontSize: 11,
     },
