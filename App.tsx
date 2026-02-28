@@ -12,6 +12,7 @@ import {
 import { ThemeProvider, useTheme } from './src/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+import OnboardingOverlay from './src/components/OnboardingOverlay';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +25,7 @@ function AppContent() {
       <NavigationContainer>
         <BottomTabNavigator />
       </NavigationContainer>
+      <OnboardingOverlay />
     </View>
   );
 }

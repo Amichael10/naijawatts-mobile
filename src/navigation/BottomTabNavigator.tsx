@@ -6,11 +6,13 @@ import { useTheme, fonts } from '../theme';
 import HomeStack from './HomeStack';
 import CalculateStack from './CalculateStack';
 import HistoryStack from './HistoryStack';
+import MoreStack from './MoreStack';
 
 export type BottomTabParamList = {
     HomeTab: undefined;
     CalculateTab: undefined;
     HistoryTab: undefined;
+    MoreTab: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -19,6 +21,7 @@ const TAB_ICONS: Record<keyof BottomTabParamList, keyof typeof Feather.glyphMap>
     HomeTab: 'home',
     CalculateTab: 'divide-circle',
     HistoryTab: 'clock',
+    MoreTab: 'menu',
 };
 
 export default function BottomTabNavigator() {
@@ -64,6 +67,11 @@ export default function BottomTabNavigator() {
                 name="HistoryTab"
                 component={HistoryStack}
                 options={{ tabBarLabel: 'History' }}
+            />
+            <Tab.Screen
+                name="MoreTab"
+                component={MoreStack}
+                options={{ tabBarLabel: 'More' }}
             />
         </Tab.Navigator>
     );

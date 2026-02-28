@@ -22,6 +22,10 @@ export {
     clearCalculationHistory,
 } from './storage';
 
+// Temp Storage for Quick Splits
+export { tempResult } from './tempStorage';
+
+
 // Calculations
 export {
     calculateSmartSplit,

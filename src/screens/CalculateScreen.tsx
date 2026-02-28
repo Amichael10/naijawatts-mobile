@@ -25,6 +25,7 @@ import {
     generateId,
     calculateSmartSplit,
     calculateEqualSplit,
+    tempResult,
     Compound,
     Calculation,
 } from '../utils';
@@ -254,7 +255,10 @@ export default function CalculateScreen() {
                 }
             } catch (e) { }
 
-            // Navigate to Results (assuming we pass the inline calc or rely on AsyncStorage history if saved)
+            if (!compound) {
+                tempResult.current = calc;
+            }
+
             // Navigate to Loading screen first
             navigation.navigate('Loading', { calculationId: compound ? compound.id : 'quick' });
         }
@@ -313,6 +317,10 @@ export default function CalculateScreen() {
                     await saveCalculation(compound.id, calc);
                 }
             } catch (e) { }
+
+            if (!compound) {
+                tempResult.current = calc;
+            }
 
             // Navigate to Loading screen first
             navigation.navigate('Loading', { calculationId: compound ? compound.id : 'quick' });

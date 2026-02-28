@@ -18,7 +18,7 @@ import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 
 import { useTheme, fonts, getTenantColor } from '../theme';
-import { loadAppData, Calculation } from '../utils';
+import { loadAppData, Calculation, tempResult } from '../utils';
 import type { CalculateStackParamList } from '../navigation/CalculateStack';
 
 type NavProp = NativeStackNavigationProp<CalculateStackParamList, 'Results'>;
@@ -195,11 +195,9 @@ export default function ResultsScreen() {
                     const data = await loadAppData();
 
                     if (cid === 'quick') {
-                        // Fallback if Quick Split was somehow skipped from saving (not ideal but we simulated savings earlier)
-                        // In real app, Quick Split might need temp storage 
-                        // We'll search across all histories for the newest matching date, or rely on passing total object.
-                        // Actually, the prompt says "The result is passed as a navigation param" natively. Let's assume there's a result prop.
-                        if ((route.params as any)?.result) {
+                        if (tempResult.current) {
+                            setupResultData(tempResult.current);
+                        } else if ((route.params as any)?.result) {
                             setupResultData((route.params as any).result);
                         }
                     } else {
@@ -455,6 +453,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     centerTextWrap: {
+        position: 'absolute',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,

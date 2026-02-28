@@ -96,18 +96,26 @@ export default function LoadingScreen() {
             {/* ── Lightning Bolt ── */}
             <View style={styles.boltContainer}>
                 {/* 1. Static Outline with Shadow */}
-                <Svg width="120" height="180" viewBox="0 0 120 180" style={StyleSheet.absoluteFill}>
+                <Svg
+                    width="120"
+                    height="180"
+                    viewBox="0 0 120 180"
+                    style={[
+                        StyleSheet.absoluteFill,
+                        {
+                            shadowColor: colors.accent,
+                            shadowRadius: 8,
+                            shadowOpacity: 0.8,
+                            shadowOffset: { width: 0, height: 0 },
+                            elevation: 5,
+                        }
+                    ]}
+                >
                     <Path
                         d={boltPath}
                         stroke={colors.accent}
                         strokeWidth="3"
                         fill="transparent"
-                        style={{
-                            shadowColor: colors.accent,
-                            shadowRadius: 8,
-                            shadowOpacity: 0.8,
-                            shadowOffset: { width: 0, height: 0 },
-                        }}
                     />
                 </Svg>
 
@@ -115,7 +123,7 @@ export default function LoadingScreen() {
                 <Animated.View
                     style={{
                         position: 'absolute',
-                        bottom: 0,
+                        top: 0,
                         width: 120,
                         overflow: 'hidden',
                         height: fillProgress,
