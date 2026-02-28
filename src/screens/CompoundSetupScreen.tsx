@@ -227,6 +227,7 @@ export default function CompoundSetupScreen() {
         }
     };
 
+    const isAddReady = newTenantName.trim().length > 0 && newTenantFlat.trim().length > 0;
     const isSaveReady = compoundName.trim().length > 0 && tenants.length >= 2;
 
     /* ────────── Render ────────── */
@@ -252,20 +253,7 @@ export default function CompoundSetupScreen() {
                     {isEditMode ? 'Edit Compound' : 'New Compound'}
                 </Text>
 
-                <TouchableOpacity
-                    onPress={handleSaveCompound}
-                    disabled={!isSaveReady}
-                    style={styles.headerBtnRight}
-                >
-                    <Text
-                        style={[
-                            styles.saveText,
-                            { color: isSaveReady ? colors.accent : colors.textSecondary },
-                        ]}
-                    >
-                        Save
-                    </Text>
-                </TouchableOpacity>
+                <View style={styles.headerBtnRight} />
             </View>
 
             <KeyboardAvoidingView
@@ -416,10 +404,15 @@ export default function CompoundSetupScreen() {
                         <TouchableOpacity
                             style={[
                                 styles.addBtn,
-                                { backgroundColor: colors.accent, marginTop: 16 },
+                                {
+                                    backgroundColor: colors.accent,
+                                    marginTop: 16,
+                                    opacity: isAddReady ? 1 : 0.4
+                                },
                             ]}
                             activeOpacity={0.85}
                             onPress={handleAddTenant}
+                            disabled={!isAddReady}
                         >
                             <Text style={[styles.addBtnText, { color: colors.accentText }]}>
                                 Add Tenant +
@@ -428,6 +421,31 @@ export default function CompoundSetupScreen() {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
+
+            {/* ── Sticky Save Button ── */}
+            <View
+                style={[
+                    styles.saveBtnWrap,
+                    { paddingBottom: insets.bottom + 16 }
+                ]}
+            >
+                <TouchableOpacity
+                    style={[
+                        styles.saveBtn,
+                        {
+                            backgroundColor: colors.accent,
+                            opacity: isSaveReady ? 1 : 0.4
+                        },
+                    ]}
+                    onPress={handleSaveCompound}
+                    disabled={!isSaveReady}
+                    activeOpacity={0.85}
+                >
+                    <Text style={[styles.saveBtnText, { color: colors.accentText }]}>
+                        Save Compound
+                    </Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -551,6 +569,25 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     addBtnText: {
+        fontFamily: fonts.bold,
+        fontSize: 16,
+    },
+    /* Save Button Footer */
+    saveBtnWrap: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        backgroundColor: 'transparent',
+    },
+    saveBtn: {
+        height: 56,
+        borderRadius: 100,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    saveBtnText: {
         fontFamily: fonts.bold,
         fontSize: 16,
     },

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import Svg, { Path, Defs, ClipPath, Rect, Circle } from 'react-native-svg';
+import Svg, { Path, Circle } from 'react-native-svg';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
@@ -12,7 +12,7 @@ type NavProp = NativeStackNavigationProp<CalculateStackParamList, 'Loading'>;
 type RouteType = RouteProp<CalculateStackParamList, 'Loading'>;
 
 /* ────────── Animated Components ────────── */
-const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
 
 /* ────────── Main Screen ────────── */
 
@@ -95,22 +95,31 @@ export default function LoadingScreen() {
         <View style={styles.root}>
             {/* ── Lightning Bolt ── */}
             <View style={styles.boltContainer}>
-                {/* 1. Static Outline with Shadow */}
+                {/* 1. Filling Layer (Plain View BEHIND) */}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        backgroundColor: colors.accent,
+                        width: 120,
+                        height: fillProgress,
+                    }}
+                />
+
+                {/* 2. Static SVG Hole & Outline (ON TOP) */}
                 <Svg
                     width="120"
                     height="180"
                     viewBox="0 0 120 180"
-                    style={[
-                        StyleSheet.absoluteFill,
-                        {
-                            shadowColor: colors.accent,
-                            shadowRadius: 8,
-                            shadowOpacity: 0.8,
-                            shadowOffset: { width: 0, height: 0 },
-                            elevation: 5,
-                        }
-                    ]}
+                    style={StyleSheet.absoluteFill}
                 >
+                    {/* The Negative Mask: Covers everything outside the bolt with screen background color */}
+                    <Path
+                        d={`M 0,0 H 120 V 180 H 0 Z ${boltPath}`}
+                        fill="#111111"
+                        fillRule="evenodd"
+                    />
+                    {/* The Outline */}
                     <Path
                         d={boltPath}
                         stroke={colors.accent}
@@ -118,23 +127,6 @@ export default function LoadingScreen() {
                         fill="transparent"
                     />
                 </Svg>
-
-                {/* 2. Filling Layer (Simplified Animated View) */}
-                <Animated.View
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        width: 120,
-                        overflow: 'hidden',
-                        height: fillProgress,
-                    }}
-                >
-                    <View style={{ position: 'absolute', bottom: 0, width: 120, height: 180 }}>
-                        <Svg width="120" height="180" viewBox="0 0 120 180">
-                            <Path d={boltPath} fill={colors.accent} />
-                        </Svg>
-                    </View>
-                </Animated.View>
 
                 {/* 3. Bubbles (Overlay) */}
                 <View style={StyleSheet.absoluteFill} pointerEvents="none">
