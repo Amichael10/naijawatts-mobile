@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 
 import { useTheme, fonts, getTenantColor } from '../theme';
 import {
@@ -161,6 +162,48 @@ function HistoryCard({
     );
 }
 
+function HistoryEmptyState({ onCalculate, title, sub }: { onCalculate: () => void, title: string, sub: string }) {
+    const { colors } = useTheme();
+    return (
+        <View style={styles.historyEmptyContainer}>
+            <Svg width="80" height="80" viewBox="0 0 80 80">
+                {/* Receipt Outline */}
+                <Path
+                    d="M 20,10 H 60 V 65 L 52,60 L 44,65 L 36,60 L 28,65 L 20,60 Z"
+                    stroke={colors.accent}
+                    strokeWidth="1.5"
+                    fill="none"
+                />
+                {/* Bolt on Receipt */}
+                <Path
+                    d="M 40,25 L 36,38 H 42 L 39,52 L 48,36 H 42 L 45,25 Z"
+                    stroke={colors.accent}
+                    strokeWidth="1.5"
+                    fill="none"
+                />
+            </Svg>
+
+            <Text style={[styles.emptyStateHeading, { color: colors.textPrimary }]}>
+                {title}
+            </Text>
+
+            <Text style={[styles.emptyStateSubtext, { color: colors.textSecondary }]}>
+                {sub}
+            </Text>
+
+            <TouchableOpacity
+                style={[styles.emptyStateBtn, { backgroundColor: colors.accent }]}
+                onPress={onCalculate}
+                activeOpacity={0.8}
+            >
+                <Text style={[styles.emptyStateBtnText, { color: colors.accentText }]}>
+                    {title === "No compounds yet" ? "Add Compound +" : "Calculate Now"}
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+
 /* ────────── Main Screen ────────── */
 
 export default function HistoryScreen() {
@@ -274,25 +317,17 @@ export default function HistoryScreen() {
 
             {/* ── History List / Empty State ── */}
             {compounds.length === 0 || !activeCompound ? (
-                <View style={styles.emptyWrap}>
-                    <Feather name="clock" size={48} color={colors.textSecondary} />
-                    <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
-                        No compounds yet
-                    </Text>
-                    <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
-                        Create a compound to start splitting
-                    </Text>
-                </View>
+                <HistoryEmptyState
+                    title="No compounds yet"
+                    sub="Create a compound to start splitting"
+                    onCalculate={() => navigation.navigate('HomeTab', { screen: 'CompoundSetup' })}
+                />
             ) : historyList.length === 0 ? (
-                <View style={styles.emptyWrap}>
-                    <Feather name="clock" size={48} color={colors.textSecondary} />
-                    <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
-                        No calculations yet
-                    </Text>
-                    <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
-                        Run your first split to see history here
-                    </Text>
-                </View>
+                <HistoryEmptyState
+                    title="No calculations yet"
+                    sub={"Your bill splits will appear here\nafter your first calculation"}
+                    onCalculate={() => navigation.navigate('CalculateTab')}
+                />
             ) : (
                 <ScrollView
                     contentContainerStyle={[
@@ -366,23 +401,36 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 
-    /* Empty State */
-    emptyWrap: {
+    /* History Empty State */
+    historyEmptyContainer: {
         flex: 1,
         alignItems: 'center',
-        paddingTop: 40,
+        justifyContent: 'center',
         paddingHorizontal: 20,
     },
-    emptyTitle: {
+    emptyStateHeading: {
         fontFamily: fonts.bold,
         fontSize: 18,
         marginTop: 16,
     },
-    emptySub: {
+    emptyStateSubtext: {
         fontFamily: fonts.regular,
         fontSize: 14,
-        marginTop: 8,
+        marginTop: 16,
         textAlign: 'center',
+        lineHeight: 20,
+    },
+    emptyStateBtn: {
+        height: 50,
+        borderRadius: 100,
+        paddingHorizontal: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+    },
+    emptyStateBtnText: {
+        fontFamily: fonts.bold,
+        fontSize: 15,
     },
 
     /* History List */

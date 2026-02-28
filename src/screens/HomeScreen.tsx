@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { CompositeNavigationProp } from '@react-navigation/native';
@@ -107,6 +108,48 @@ function MiniColorBar({ splits }: { splits: Calculation['splits'] }) {
     );
 }
 
+function HomeEmptyState({ onAdd }: { onAdd: () => void }) {
+    const { colors } = useTheme();
+    return (
+        <View style={styles.homeEmptyContainer}>
+            <Svg width="80" height="80" viewBox="0 0 80 80">
+                {/* House Outline */}
+                <Path
+                    d="M 15,70 V 35 L 40,15 L 65,35 V 70 H 15 Z"
+                    stroke={colors.accent}
+                    strokeWidth="1.5"
+                    fill="none"
+                />
+                {/* Small Lightning Bolt */}
+                <Path
+                    d="M 40,30 L 35,45 H 41 L 38,60 L 48,43 H 42 L 45,30 Z"
+                    stroke={colors.accent}
+                    strokeWidth="1.5"
+                    fill="none"
+                />
+            </Svg>
+
+            <Text style={[styles.emptyStateHeading, { color: colors.textPrimary }]}>
+                No compounds yet
+            </Text>
+
+            <Text style={[styles.emptyStateSubtext, { color: colors.textSecondary }]}>
+                Add your first compound to start{"\n"}splitting bills
+            </Text>
+
+            <TouchableOpacity
+                style={[styles.emptyStateBtn, { backgroundColor: colors.accent }]}
+                onPress={onAdd}
+                activeOpacity={0.8}
+            >
+                <Text style={[styles.emptyStateBtnText, { color: colors.accentText }]}>
+                    Add Compound +
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+
 /* ────────── Home Screen ────────── */
 
 export default function HomeScreen() {
@@ -175,226 +218,211 @@ export default function HomeScreen() {
                     </Text>
                 </View>
 
-                {/* ── Hero Card ── */}
-                {latestCalc ? (
-                    <View
-                        style={[
-                            styles.heroCard,
-                            {
-                                backgroundColor: colors.bgCard,
-                                borderColor: colors.border,
-                                ...Platform.select({
-                                    ios: {
-                                        shadowColor: '#000',
-                                        shadowOpacity: 0.12,
-                                        shadowRadius: 12,
-                                        shadowOffset: { width: 0, height: 4 },
-                                    },
-                                    android: { elevation: 4 },
-                                }),
-                            },
-                        ]}
-                    >
-                        <Text style={[styles.heroLabel, { color: colors.textSecondary }]}>
-                            Last Split
-                        </Text>
-                        <Text style={[styles.heroName, { color: colors.textPrimary }]}>
-                            {latestCalc.compound.name}
-                        </Text>
-                        <Text style={[styles.heroDate, { color: colors.textSecondary }]}>
-                            {formatDate(latestCalc.calc.date)}
-                        </Text>
-                        <Text style={[styles.heroAmount, { color: colors.accent }]}>
-                            {formatNaira(latestCalc.calc.totalAmount)}
-                        </Text>
-
-                        {/* Tenant color bar */}
-                        <View style={styles.heroBarWrap}>
-                            <TenantColorBar splits={latestCalc.calc.splits} />
-                        </View>
-
-                        {/* Legend */}
-                        <View style={styles.legendRow}>
-                            {latestCalc.calc.splits.map((s, i) => (
-                                <View key={`${s.tenantId}-${i}`} style={styles.legendItem}>
-                                    <View
-                                        style={[
-                                            styles.legendDot,
-                                            { backgroundColor: getTenantColor(s.colorIndex) },
-                                        ]}
-                                    />
-                                    <Text
-                                        style={[styles.legendText, { color: colors.textSecondary }]}
-                                        numberOfLines={1}
-                                    >
-                                        {s.name} • {formatNaira(s.share)}
-                                    </Text>
-                                </View>
-                            ))}
-                        </View>
-
-                        {/* Split Again button */}
-                        <TouchableOpacity
-                            style={[styles.splitAgainBtn, { borderColor: colors.accent }]}
-                            onPress={() =>
-                                navigation.navigate('CalculateTab' as any)
-                            }
-                        >
-                            <Text
-                                style={[styles.splitAgainText, { color: colors.accent }]}
-                            >
-                                Split Again →
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+                {compounds.length === 0 ? (
+                    <HomeEmptyState onAdd={() => navigation.navigate('CompoundSetup')} />
                 ) : (
-                    <View
-                        style={[
-                            styles.emptyCard,
-                            { borderColor: colors.border },
-                        ]}
-                    >
-                        <Feather name="home" size={32} color={colors.textSecondary} />
-                        <Text
-                            style={[styles.emptyText, { color: colors.textSecondary }]}
-                        >
-                            No compounds yet
-                        </Text>
-                        <Text
-                            style={[styles.emptySubtext, { color: colors.textSecondary }]}
-                        >
-                            Add a compound to get started
-                        </Text>
-                    </View>
-                )}
+                    <>
+                        {/* ── Hero Card ── */}
+                        {latestCalc && (
+                            <View
+                                style={[
+                                    styles.heroCard,
+                                    {
+                                        backgroundColor: colors.bgCard,
+                                        borderColor: colors.border,
+                                        ...Platform.select({
+                                            ios: {
+                                                shadowColor: '#000',
+                                                shadowOpacity: 0.12,
+                                                shadowRadius: 12,
+                                                shadowOffset: { width: 0, height: 4 },
+                                            },
+                                            android: { elevation: 4 },
+                                        }),
+                                    },
+                                ]}
+                            >
+                                <Text style={[styles.heroLabel, { color: colors.textSecondary }]}>
+                                    Last Split
+                                </Text>
+                                <Text style={[styles.heroName, { color: colors.textPrimary }]}>
+                                    {latestCalc.compound.name}
+                                </Text>
+                                <Text style={[styles.heroDate, { color: colors.textSecondary }]}>
+                                    {formatDate(latestCalc.calc.date)}
+                                </Text>
+                                <Text style={[styles.heroAmount, { color: colors.accent }]}>
+                                    {formatNaira(latestCalc.calc.totalAmount)}
+                                </Text>
 
-                {/* ── Compounds List ── */}
-                {compounds.length > 0 && (
-                    <View style={styles.section}>
-                        <Text
-                            style={[styles.sectionTitle, { color: colors.textPrimary }]}
-                        >
-                            Your Compounds
-                        </Text>
-                        {compounds.map((compound) => {
-                            const lastCalc = compound.history[0];
-                            return (
+                                {/* Tenant color bar */}
+                                <View style={styles.heroBarWrap}>
+                                    <TenantColorBar splits={latestCalc.calc.splits} />
+                                </View>
+
+                                {/* Legend */}
+                                <View style={styles.legendRow}>
+                                    {latestCalc.calc.splits.map((s, i) => (
+                                        <View key={`${s.tenantId}-${i}`} style={styles.legendItem}>
+                                            <View
+                                                style={[
+                                                    styles.legendDot,
+                                                    { backgroundColor: getTenantColor(s.colorIndex) },
+                                                ]}
+                                            />
+                                            <Text
+                                                style={[styles.legendText, { color: colors.textSecondary }]}
+                                                numberOfLines={1}
+                                            >
+                                                {s.name} • {formatNaira(s.share)}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+
+                                {/* Split Again button */}
                                 <TouchableOpacity
-                                    key={compound.id}
-                                    style={[
-                                        styles.compoundCard,
-                                        {
-                                            backgroundColor: colors.bgCard,
-                                            borderColor: colors.border,
-                                            ...Platform.select({
-                                                ios: {
-                                                    shadowColor: '#000',
-                                                    shadowOpacity: 0.08,
-                                                    shadowRadius: 8,
-                                                    shadowOffset: { width: 0, height: 2 },
-                                                },
-                                                android: { elevation: 2 },
-                                            }),
-                                        },
-                                    ]}
+                                    style={[styles.splitAgainBtn, { borderColor: colors.accent }]}
                                     onPress={() =>
                                         navigation.navigate('CalculateTab' as any)
                                     }
-                                    activeOpacity={0.7}
                                 >
-                                    <View style={styles.compoundLeft}>
-                                        <Text
-                                            style={[
-                                                styles.compoundName,
-                                                { color: colors.textPrimary },
-                                            ]}
-                                        >
-                                            {compound.name}
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.compoundSub,
-                                                { color: colors.textSecondary },
-                                            ]}
-                                        >
-                                            {compound.tenants.length} tenant
-                                            {compound.tenants.length !== 1 ? 's' : ''}
-                                        </Text>
-                                    </View>
-
-                                    <View style={styles.compoundRight}>
-                                        {lastCalc && (
-                                            <>
-                                                <MiniColorBar splits={lastCalc.splits} />
-                                                <Text
-                                                    style={[
-                                                        styles.compoundAmount,
-                                                        { color: colors.accent },
-                                                    ]}
-                                                >
-                                                    {formatNaira(lastCalc.totalAmount)}
-                                                </Text>
-                                            </>
-                                        )}
-                                    </View>
-
-                                    <Feather
-                                        name="chevron-right"
-                                        size={18}
-                                        color={colors.textSecondary}
-                                    />
+                                    <Text
+                                        style={[styles.splitAgainText, { color: colors.accent }]}
+                                    >
+                                        Split Again →
+                                    </Text>
                                 </TouchableOpacity>
-                            );
-                        })}
-                    </View>
+                            </View>
+                        )}
+
+                        {/* ── Compounds List ── */}
+                        <View style={styles.section}>
+                            <Text
+                                style={[styles.sectionTitle, { color: colors.textPrimary }]}
+                            >
+                                Your Compounds
+                            </Text>
+                            {compounds.map((compound) => {
+                                const lastCalc = compound.history[0];
+                                return (
+                                    <TouchableOpacity
+                                        key={compound.id}
+                                        style={[
+                                            styles.compoundCard,
+                                            {
+                                                backgroundColor: colors.bgCard,
+                                                borderColor: colors.border,
+                                                ...Platform.select({
+                                                    ios: {
+                                                        shadowColor: '#000',
+                                                        shadowOpacity: 0.08,
+                                                        shadowRadius: 8,
+                                                        shadowOffset: { width: 0, height: 2 },
+                                                    },
+                                                    android: { elevation: 2 },
+                                                }),
+                                            },
+                                        ]}
+                                        onPress={() =>
+                                            navigation.navigate('CalculateTab' as any)
+                                        }
+                                        activeOpacity={0.7}
+                                    >
+                                        <View style={styles.compoundLeft}>
+                                            <Text
+                                                style={[
+                                                    styles.compoundName,
+                                                    { color: colors.textPrimary },
+                                                ]}
+                                            >
+                                                {compound.name}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.compoundSub,
+                                                    { color: colors.textSecondary },
+                                                ]}
+                                            >
+                                                {compound.tenants.length} tenant
+                                                {compound.tenants.length !== 1 ? 's' : ''}
+                                            </Text>
+                                        </View>
+
+                                        <View style={styles.compoundRight}>
+                                            {lastCalc && (
+                                                <>
+                                                    <MiniColorBar splits={lastCalc.splits} />
+                                                    <Text
+                                                        style={[
+                                                            styles.compoundAmount,
+                                                            { color: colors.accent },
+                                                        ]}
+                                                    >
+                                                        {formatNaira(lastCalc.totalAmount)}
+                                                    </Text>
+                                                </>
+                                            )}
+                                        </View>
+
+                                        <Feather
+                                            name="chevron-right"
+                                            size={18}
+                                            color={colors.textSecondary}
+                                        />
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+
+                        {/* ── Bottom Buttons ── */}
+                        <View style={styles.buttonsWrap}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.primaryBtn,
+                                    { backgroundColor: colors.accent },
+                                ]}
+                                activeOpacity={0.85}
+                                onPress={() => navigation.navigate('CompoundSetup')}
+                            >
+                                <Feather
+                                    name="plus"
+                                    size={20}
+                                    color={colors.accentText}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <Text
+                                    style={[styles.primaryBtnText, { color: colors.accentText }]}
+                                >
+                                    New Compound
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[
+                                    styles.secondaryBtn,
+                                    { borderColor: colors.accent },
+                                ]}
+                                activeOpacity={0.85}
+                                onPress={() =>
+                                    navigation.navigate('CalculateTab' as any)
+                                }
+                            >
+                                <Feather
+                                    name="zap"
+                                    size={20}
+                                    color={colors.accent}
+                                    style={{ marginRight: 8 }}
+                                />
+                                <Text
+                                    style={[styles.secondaryBtnText, { color: colors.accent }]}
+                                >
+                                    Quick Split
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </>
                 )}
-
-                {/* ── Bottom Buttons ── */}
-                <View style={styles.buttonsWrap}>
-                    <TouchableOpacity
-                        style={[
-                            styles.primaryBtn,
-                            { backgroundColor: colors.accent },
-                        ]}
-                        activeOpacity={0.85}
-                        onPress={() => navigation.navigate('CompoundSetup')}
-                    >
-                        <Feather
-                            name="plus"
-                            size={20}
-                            color={colors.accentText}
-                            style={{ marginRight: 8 }}
-                        />
-                        <Text
-                            style={[styles.primaryBtnText, { color: colors.accentText }]}
-                        >
-                            New Compound
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[
-                            styles.secondaryBtn,
-                            { borderColor: colors.accent },
-                        ]}
-                        activeOpacity={0.85}
-                        onPress={() =>
-                            navigation.navigate('CalculateTab' as any)
-                        }
-                    >
-                        <Feather
-                            name="zap"
-                            size={20}
-                            color={colors.accent}
-                            style={{ marginRight: 8 }}
-                        />
-                        <Text
-                            style={[styles.secondaryBtnText, { color: colors.accent }]}
-                        >
-                            Quick Split
-                        </Text>
-                    </TouchableOpacity>
-                </View>
             </ScrollView>
         </View>
     );
@@ -496,25 +524,36 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
 
-    /* Empty state */
-    emptyCard: {
-        borderRadius: 16,
-        padding: 32,
-        marginBottom: 28,
-        borderWidth: 1.5,
-        borderStyle: 'dashed',
+    /* Home Empty State */
+    homeEmptyContainer: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        paddingVertical: 60,
     },
-    emptyText: {
+    emptyStateHeading: {
         fontFamily: fonts.bold,
-        fontSize: 16,
-        marginTop: 12,
+        fontSize: 18,
+        marginTop: 16,
     },
-    emptySubtext: {
+    emptyStateSubtext: {
         fontFamily: fonts.regular,
-        fontSize: 13,
-        marginTop: 4,
+        fontSize: 14,
+        marginTop: 16,
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+    emptyStateBtn: {
+        height: 50,
+        borderRadius: 100,
+        paddingHorizontal: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+    },
+    emptyStateBtnText: {
+        fontFamily: fonts.bold,
+        fontSize: 15,
     },
 
     /* Section */
