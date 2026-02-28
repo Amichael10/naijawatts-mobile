@@ -13,11 +13,20 @@ import { ThemeProvider, useTheme } from './src/theme';
 import * as SplashScreen from 'expo-splash-screen';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 import OnboardingOverlay from './src/components/OnboardingOverlay';
+import SplashScreenComponent from './src/screens/SplashScreen';
 
 SplashScreen.preventAutoHideAsync();
 
-function AppContent() {
+function AppContent({ onSplashFinish }: { onSplashFinish: () => void }) {
   const { mode, colors } = useTheme();
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreenComponent onFinish={() => {
+      setShowSplash(false);
+      onSplashFinish();
+    }} />;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bgPrimary }}>
@@ -67,7 +76,9 @@ export default function App() {
 
   return (
     <ThemeProvider initialTheme={initialTheme}>
-      <AppContent />
+      <AppContent onSplashFinish={() => {
+        // Any final post-splash logic
+      }} />
     </ThemeProvider>
   );
 }
