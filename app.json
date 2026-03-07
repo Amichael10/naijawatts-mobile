@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash-static.png",
       "resizeMode": "contain",
       "backgroundColor": "#111111"
     },
@@ -16,12 +16,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#111111",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#111111"
       },
-      "predictiveBackGestureEnabled": false,
       "package": "com.amichaeldesign.naijawatts"
     },
     "web": {
