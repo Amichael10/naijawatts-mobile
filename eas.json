@@ -10,7 +10,6 @@
             }
         },
         "production": {
-            "image": "latest",
             "android": {
                 "buildType": "app-bundle"
             }
