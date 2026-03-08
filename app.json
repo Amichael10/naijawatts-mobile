@@ -21,6 +21,7 @@
         "backgroundColor": "#111111"
       },
       "package": "com.amichaeldesign.naijawatts",
+      "versionCode": 2,
       "targetSdkVersion": 35
     },
     "web": {
