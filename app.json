@@ -20,7 +20,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "backgroundColor": "#111111"
       },
-      "package": "com.amichaeldesign.naijawatts"
+      "package": "com.amichaeldesign.naijawatts",
+      "targetSdkVersion": 35
     },
     "web": {
       "favicon": "./assets/favicon.png"
