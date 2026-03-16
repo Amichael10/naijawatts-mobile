@@ -21,20 +21,30 @@
         "backgroundColor": "#111111"
       },
       "package": "com.amichaeldesign.naijawatts",
-      "versionCode": 2,
-      "targetSdkVersion": 35
+      "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font",
-      "expo-splash-screen"
+      "expo-splash-screen",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
-        "projectId": "018ced2f-5c04-4329-b81f-c26727f90fcf"
+        "projectId": "44f104dc-882c-4ba0-8b9c-1c827aa295c2"
       }
-    }
+    },
+    "owner": "amichaelwale"
   }
 }
