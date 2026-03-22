@@ -208,8 +208,6 @@ export default function CalculateScreen() {
             }
 
             // Execute calculation
-            const finalTotalAmount = hasTotal ? total : units * cost;
-
             let inputTenants: any[] = [];
             if (selectedCompoundId !== 'quick' && compound) {
                 inputTenants = compound.tenants.map((t) => ({
@@ -230,6 +228,31 @@ export default function CalculateScreen() {
                     }));
             }
 
+            // Calculate total kWh actually used by all tenants
+            const totalKwhUsed = inputTenants.reduce((sum: number, t: any) => sum + t.kwh, 0);
+
+            // Determine finalTotalAmount based on input method
+            let finalTotalAmount: number;
+            let calcUnusedUnits: number | undefined;
+            let calcUnusedAmount: number | undefined;
+            let calcUnitsPurchased: number | undefined;
+            let calcCostPerUnit: number | undefined;
+
+            if (hasTotal) {
+                // User entered a lump total — split the full amount as before
+                finalTotalAmount = total;
+            } else {
+                // User entered cost per unit — only charge for actual usage
+                finalTotalAmount = totalKwhUsed * cost;
+                calcCostPerUnit = cost;
+
+                if (hasUnits) {
+                    calcUnitsPurchased = units;
+                    calcUnusedUnits = Math.max(0, units - totalKwhUsed);
+                    calcUnusedAmount = calcUnusedUnits * cost;
+                }
+            }
+
             const splits = calculateSmartSplit(finalTotalAmount, inputTenants);
 
             // Check for NaN or Infinity
@@ -245,6 +268,10 @@ export default function CalculateScreen() {
                 totalAmount: finalTotalAmount,
                 splits,
                 compoundName: compound ? compound.name : 'Quick Split',
+                unitsPurchased: calcUnitsPurchased,
+                costPerUnit: calcCostPerUnit,
+                unusedUnits: calcUnusedUnits,
+                unusedAmount: calcUnusedAmount,
             };
 
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);

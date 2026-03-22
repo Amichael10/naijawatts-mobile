@@ -377,6 +377,45 @@ export default function ResultsScreen() {
                     ))}
                 </View>
 
+                {/* ── Unused Balance ── */}
+                {result.unusedAmount != null && result.unusedAmount > 0 && (
+                    <View
+                        style={[
+                            styles.unusedCard,
+                            {
+                                backgroundColor: colors.bgCard,
+                                borderColor: colors.accent,
+                            },
+                        ]}
+                    >
+                        <View style={styles.unusedHeader}>
+                            <Feather name="zap" size={18} color={colors.accent} />
+                            <Text style={[styles.unusedTitle, { color: colors.accent }]}>
+                                Unused Balance
+                            </Text>
+                        </View>
+                        <View style={styles.unusedRow}>
+                            <Text style={[styles.unusedLabel, { color: colors.textSecondary }]}>
+                                Unused Units
+                            </Text>
+                            <Text style={[styles.unusedValue, { color: colors.textPrimary }]}>
+                                {result.unusedUnits?.toLocaleString('en-NG')} kWh
+                            </Text>
+                        </View>
+                        <View style={styles.unusedRow}>
+                            <Text style={[styles.unusedLabel, { color: colors.textSecondary }]}>
+                                Remaining Balance
+                            </Text>
+                            <Text style={[styles.unusedValue, { color: colors.accent }]}>
+                                ₦{result.unusedAmount.toLocaleString('en-NG', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2,
+                                })}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+
                 {/* ── Actions ── */}
                 <View style={styles.actions}>
                     <TouchableOpacity
@@ -548,4 +587,36 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     calcAgainText: { fontFamily: fonts.bold, fontSize: 16 },
+
+    /* Unused Balance */
+    unusedCard: {
+        padding: 16,
+        borderRadius: 14,
+        borderWidth: 1.5,
+        marginBottom: 32,
+    },
+    unusedHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        gap: 8,
+    },
+    unusedTitle: {
+        fontFamily: fonts.bold,
+        fontSize: 15,
+    },
+    unusedRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    unusedLabel: {
+        fontFamily: fonts.regular,
+        fontSize: 14,
+    },
+    unusedValue: {
+        fontFamily: fonts.bold,
+        fontSize: 15,
+    },
 });

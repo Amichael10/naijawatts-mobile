@@ -148,6 +148,13 @@ function HistoryCard({
                 ))}
             </View>
 
+            {/* Unused Balance */}
+            {calc.unusedAmount != null && calc.unusedAmount > 0 && (
+                <Text style={[styles.unusedBalanceText, { color: colors.accent }]}>
+                    ⚡ ₦{calc.unusedAmount.toLocaleString('en-NG')} unused balance ({calc.unusedUnits?.toLocaleString('en-NG')} kWh)
+                </Text>
+            )}
+
             {/* Bottom Share Button */}
             <View style={styles.cardBottomRow}>
                 <TouchableOpacity
@@ -517,6 +524,13 @@ const styles = StyleSheet.create({
     inlineShareText: {
         fontFamily: fonts.medium,
         fontSize: 11,
+    },
+
+    /* Unused Balance */
+    unusedBalanceText: {
+        fontFamily: fonts.medium,
+        fontSize: 12,
+        marginTop: 8,
     },
 
     /* Clear BTN */

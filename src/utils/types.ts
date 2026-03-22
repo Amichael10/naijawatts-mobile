@@ -25,6 +25,11 @@ export type Calculation = {
     totalAmount: number;
     splits: SplitResult[];
     compoundName: string;
+    // Unused balance tracking (Smart Split with cost-per-unit only)
+    unitsPurchased?: number;
+    costPerUnit?: number;
+    unusedUnits?: number;
+    unusedAmount?: number;
 };
 
 export type Compound = {
