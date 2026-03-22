@@ -21,7 +21,7 @@
         "backgroundColor": "#111111"
       },
       "package": "com.amichaeldesign.naijawatts",
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "favicon": "./assets/favicon.png"
