@@ -2,8 +2,8 @@
   "expo": {
     "name": "NaijaWatts",
     "slug": "naijawatts",
-    "version": "1.1.1",
-    "orientation": "portrait",
+    "version": "1.1.2",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -21,7 +21,7 @@
         "backgroundColor": "#111111"
       },
       "package": "com.amichaeldesign.naijawatts",
-      "versionCode": 6
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/favicon.png"
