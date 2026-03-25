@@ -1,0 +1,48 @@
+﻿[
+  {
+    "id": "668ebf6b-3cc1-4627-b783-ae6e4b5066c3",
+    "status": "FINISHED",
+    "platform": "ANDROID",
+    "artifacts": {
+      "buildUrl": "https://expo.dev/artifacts/eas/dEwxhpTDYHxv8jrrsNACc6.aab",
+      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/dEwxhpTDYHxv8jrrsNACc6.aab"
+    },
+    "initiatingActor": {
+      "id": "4230e434-4abf-4bff-b22e-d152d626c592",
+      "displayName": "amichaelwale"
+    },
+    "logFiles": [
+      "https://job-logs.eascdn.net/production/668ebf6b-3cc1-4627-b783-ae6e4b5066c3/1774355329979-d4181e2a-0a72-47c2-8824-44a0786b552e.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260324%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260324T135636Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=4c42f74f726160e4152e641e5822fd0050c2a4257628a515c12beac48406737754e539911e9eefe1c1815402ef38779259a490d00ab70297d3a84314f71fb0deec0f54138edaa41acb4ae30994a4df7e0966d3e076f459161dd80c1eb71d04022c641d61803b61fdb84bcad2e43370ed6c3bef14bfd3d35e38d64a7ac003e4aff8ab4a339d95f166abf742db78fcfca6b175a339a753b8b5bd792915ab835899f1a4ea5e251a5438cb9ca16ebbcd7b4e1e20c794935c1a433edbc2cb82038b0fb3350d7d3c971ee3fea50d540c48af4b2fe440ce1b08040ff635a5f137545dec00f236b13fb0cb405caa8f1d51dbdd71c70f29fdf3c7afebe3f3c36f7b72dd88",
+      "https://job-logs.eascdn.net/production/668ebf6b-3cc1-4627-b783-ae6e4b5066c3/1774356098654-30e7a8f4-0a27-4b30-a343-1c4f6772faf5.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260324%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260324T135636Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=d024c1c56206b8ceebdb9c14567b574edad3d5845e7437f346685aac0a3779eaf7c13554a8650a585e0ae04cdb102ebb0d178ad7d48348711b1c2af2864b52f528347f02c5400fce62198ad2cfc00f2ceac8d8de3235bf106a3146a928e65bbd1e1e6e5d3cf680f0e353119b3785a945f3c90a53187f073a8ef540aeaef83621714207eb062d1b83aa15ba48763d9cf8ed76a3244d70a16bb0b04548faf4736b7750f10e573b5d4fd78c050aa93ae174ad52b23289a44084e265e3493f84d342e07c2ed11076e29418c4eafd6e7fd4c7a5580d00bdf5bfc2d29741e5334808188f305ba5ca41924cb1bde24dbe09cddc4632909929f8559f9f7cfa9c3edcc9e3",
+      "https://job-logs.eascdn.net/production/668ebf6b-3cc1-4627-b783-ae6e4b5066c3/1774356098936-0c6c057d-b9bc-4c23-bca4-e58fb4b91cb0.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260324%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260324T135636Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=ad594b7346f03f566d52b3f9458854eee0c1033c55ed1b662dea2fa2af2095e72f6e5f3c7f92a969129e8b3961f1b26348516fb63f375f408f2e2cdcaef13431e43cdf7b909cf78330fb323a7d6a86cc2d31783b79c39034fac91c0d6894ab9badd833fec96cde08dff6eb95219ed00e1987ce00d5eb2d0fa2cf805e615c7f306ce60e8696fff20843a78429e1aed445859fc1f4286f68b3ebb7c8f14082780d9d2d790d124ad0800a171b3b8ec07660b4dc43c2a7341ec3f2cd082d195a3542ca1ec0a50c21d0c2b07b7b35d30b47edd4083fc019e26f4d231eb03d9f90d85430badb0490af66c74a4b7f2be4ec70f76cb024efb081ea817a2ea2dc08eeb6a5",
+      "https://job-logs.eascdn.net/production/668ebf6b-3cc1-4627-b783-ae6e4b5066c3/1774356099120-8d87d89e-ffb3-47e2-9fd2-ae998b8e32bc.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260324%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260324T135636Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=7a8942cbf0fe325475a4dbd77664f817bb7438832c66d574b7d93817b6a10e3632249ae0b1c82196580b648ebd2bb8925a4994acd168157af0aaffa4fad24e24b5579db4e4763daa5f739a8eec6d896d5e6d94f16385b076b38fe721464e4fdff1612879bda35271d8315bdcf63ba96e630e3cd6eefab0ec98b0a02c4b8cd23168e602096e3c9c2761007f9d455e7be3695c7135f6d83587ac77077f73eeb2c5e901c17be0c82727f7c717dd094233bdd4ece74a869ba318bfb2f636621055d26f254cc7af52800e79a0a909eb58b4533aa203ea3d06b81e11f3408983168d0f126d2c2bd50604429e66f9dad2db209b9d3d687ec7a1de89726f9f11e78052a5"
+    ],
+    "project": {
+      "id": "44f104dc-882c-4ba0-8b9c-1c827aa295c2",
+      "name": "naijawatts",
+      "slug": "naijawatts",
+      "ownerAccount": {
+        "id": "0d190b16-27a6-48df-8481-4faf9e2f092c",
+        "name": "amichaelwale"
+      }
+    },
+    "distribution": "STORE",
+    "buildProfile": "production",
+    "sdkVersion": "50.0.0",
+    "appVersion": "1.1.1",
+    "appBuildVersion": "6",
+    "gitCommitHash": "b92c13789dd0cfa3d4ae9b7ee1f7642d7f40e12c",
+    "gitCommitMessage": "chore: fix hardcoded versionCode and versionName in build.gradle",
+    "priority": "NORMAL",
+    "createdAt": "2026-03-24T12:28:49.649Z",
+    "updatedAt": "2026-03-24T12:47:04.268Z",
+    "completedAt": "2026-03-24T12:47:01.674Z",
+    "expirationDate": "2026-04-23T12:28:49.773Z",
+    "isForIosSimulator": false,
+    "metrics": {
+      "buildWaitTime": 213,
+      "buildQueueTime": 797513,
+      "buildDuration": 293905
+    }
+  }
+]
