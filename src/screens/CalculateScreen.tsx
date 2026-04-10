@@ -547,6 +547,13 @@ export default function CalculateScreen() {
                                         onChangeText={(val) => {
                                             handleNumberInput(val, setUnitsPurchased);
                                             clearError('smartTotal');
+                                            
+                                            // Auto-calc cost if amount present
+                                            const amount = parseFloat(smartTotalAmount);
+                                            const units = parseFloat(val);
+                                            if (!isNaN(amount) && amount > 0 && !isNaN(units)) {
+                                                setCostPerUnit((amount / units).toFixed(2).replace(/\.00$/, ''));
+                                            }
                                         }}
                                     />
                                 </View>
@@ -580,6 +587,13 @@ export default function CalculateScreen() {
                                         onChangeText={(val) => {
                                             handleNumberInput(val, setCostPerUnit);
                                             clearError('smartTotal');
+                                            
+                                            // Auto-calc amount if units present
+                                            const units = parseFloat(unitsPurchased);
+                                            const cost = parseFloat(val);
+                                            if (!isNaN(units) && units > 0 && !isNaN(cost)) {
+                                                setSmartTotalAmount(Math.round(units * cost).toString());
+                                            }
                                         }}
                                     />
                                 </View>
@@ -604,16 +618,28 @@ export default function CalculateScreen() {
                                         onChangeText={(val) => {
                                             handleNumberInput(val, setSmartTotalAmount);
                                             clearError('smartTotal');
+                                            
+                                            // Auto-calc cost if units present
+                                            const units = parseFloat(unitsPurchased);
+                                            const amount = parseFloat(val);
+                                            if (!isNaN(units) && units > 0 && !isNaN(amount)) {
+                                                setCostPerUnit((amount / units).toFixed(2).replace(/\.00$/, ''));
+                                            }
                                         }}
                                     />
-                                    <Text style={[styles.noteText, { color: colors.textSecondary }]}>
-                                        Enter either cost per unit OR total amount
-                                    </Text>
                                     {errors.smartTotal && (
                                         <Text style={[styles.errorText, { color: colors.error }]}>
                                             {errors.smartTotal}
                                         </Text>
                                     )}
+                                </View>
+
+                                {/* Disclaimer */}
+                                <View style={[styles.disclaimerBox, { backgroundColor: mode === 'dark' ? '#5A621D' : '#C5D07E' }]}>
+                                    <Feather name="alert-triangle" size={18} color={mode === 'dark' ? '#E8EAED' : '#3C4043'} />
+                                    <Text style={[styles.disclaimerText, { color: mode === 'dark' ? '#E8EAED' : '#3C4043' }]}>
+                                        Total amount may include VAT & service charges. Please confirm this rate matches your actual unit price.
+                                    </Text>
                                 </View>
                             </View>
 
@@ -998,5 +1024,19 @@ const styles = StyleSheet.create({
     calcBtnText: {
         fontFamily: fonts.bold,
         fontSize: 16,
+    },
+    disclaimerBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        borderRadius: 12,
+        marginTop: 16,
+        gap: 12,
+    },
+    disclaimerText: {
+        flex: 1,
+        fontFamily: fonts.medium,
+        fontSize: 12,
+        lineHeight: 18,
     },
 });

@@ -137,7 +137,7 @@ function DonutChart({
         <View style={styles.chartWrap}>
             <Svg width={cx * 2} height={cy * 2} viewBox={`0 0 ${cx * 2} ${cy * 2}`}>
                 {result.splits.map((s, i) => {
-                    if (s.share <= 0) return null;
+                    if (s.share <= 0 || total <= 0) return null;
 
                     const sliceDegrees = (s.share / total) * 360;
                     const start = currentStartAngle;
